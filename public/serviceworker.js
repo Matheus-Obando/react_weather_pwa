@@ -16,10 +16,31 @@ self.addEventListener('install', (event) => {
 
 // Listen for requests
 self.addEventListener('fetch', (event) => {
-    console.log('Service worker fetch event for URL: ')
+    console.log('Fetch event intercepted for: ', event.request.url);
+    event.respondWith(caches.match(event.request)
+        .then(() =>
+        {
+            return fetch(event.request)
+            .catch(() => caches.match('offline.html'));
+        })
+    );
 });
 
 //Activate the Service Worker
 self.addEventListener('activate', (event) => {
     console.log('Service Worker activate event')
+    const cacheWhitelist = [];
+    cacheWhitelist.push(CACHE_NAME);
+
+    event.waitUntil(
+        caches.keys().then((cacheNames) => Promise.all(
+            cacheNames.map((cacheName) =>
+            {
+                if (!cacheWhitelist.includes(cacheName))
+                {
+                    return caches.delete(cacheName);
+                }
+            })
+        ))
+    )
 });
