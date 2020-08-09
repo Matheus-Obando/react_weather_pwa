@@ -7,9 +7,8 @@ const App = () => {
     const [weather, setWeather] = useState({});
 
     const search = async (e) => {
-        if (e.key === 'Enter' && query.value != null){
+        if (e.key === 'Enter' && query.value !== ''){
             const data = await fetchWeather(query);
-
             setWeather(data);
             setQuery('');
         }
